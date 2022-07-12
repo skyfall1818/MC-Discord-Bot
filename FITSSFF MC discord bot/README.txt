@@ -1,43 +1,50 @@
-      />________________                        ________________<\
-[#####[]________________> Welcome to Story Bot <________________[]#####]
-      \>                                                        </
-	       
-*** use '>hello' to talk to the bot ***
+      />________________                                   ________________<\
+[#####[]________________> Welcome to FITSFF Minecraft Bot <________________[]#####]
+      \>                                                                   </
+
+*** Use '^' as your key ***
 *** for any further questions or ideas ask my creator ***
+============= Main Commands =============
+ Lists servers to run
+ 'run'
+ 'r'
 
-============== Gameplay ==============
- List of stories to play
- '>p'
- '>play'
+ Select server to run
+ 'run [Index]'
+ 'r [Index]'
 
- Select game to play/ play new game
- '>p [Number]'
- '>play [Number]'
+ Stops sever
+ 'stop'
+ 's'
+ 
+ type in server commands
+ 'command'
+ 'c'
+ 
+ Shows current server log
+ 'log'
+ 'l'
+ 
+ Checks if server is running and players on the server
+ 'status'
 
- Select scenario option
- '>[number]'
-
- Reprint scenario
- '>r'
- '>replay'
-
-================ Others ================
+============ Setting Changes ============
  Help
- '>h'
- '>help'
+ 'h'
+ 'help'
 
- Upload game
- '>u[.xlsx file]'
- '>upload[.xlsx file]'
+ Rename server
+ 'rename [index] [new name]'
+ 're [index] [new name]'
+ 
+ Show server settings
+ 'setting [index]'
+ 'set [index]'
+ 
+ Change server sttings
+ 'setting [index] [line number] [new variable (can be left blank)]'
+ 'set [index] [line number] [new variable (can be left blank)]'
 
- Delete game
- '>d [number]'
- '>delete [number]'
-
- List Deletable game
- '>d'
- '>delete'
- *you can only delete the games you upload*
-
-================ Designing Your Tree ================
-
+ get CPU temperature
+ 'temperature'
+ 'temp'

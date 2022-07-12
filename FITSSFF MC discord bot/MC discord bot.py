@@ -56,7 +56,7 @@ with open(KEY_FILE, "r") as file:
             print("Error: cannot split line")
 
 #bot = discord.Client()
-bot = commands.Bot(command_prefix=KEYWORD)
+bot = commands.Bot(command_prefix=KEYWORD, help_command = None)
 
 
 def embed(header, context, RGB=GREEN):
@@ -75,7 +75,15 @@ async def on_ready():
 	# PRINTS HOW MANY GUILDS / SERVERS THE BOT IS IN.
         print("SampleDiscordBot is in " + str(guild_count) + " guilds.")
 # EVENT LISTENER FOR WHEN A NEW MESSAGE IS SENT TO A CHANNEL.
-    
+
+@bot.command()
+@commands.has_role(ADMIN_TAG)
+async def help(ctx):
+    text=''
+    with open(README, 'r') as f:
+        text = f.read()
+    await context.send('```' + text +'```')
+  
 @bot.command(aliases=['r', 'run'])
 @commands.has_role(ADMIN_TAG)
 async def _run(ctx, index = ''):
@@ -151,7 +159,7 @@ async def status(ctx):
     if out:
         await ctx.send(embed = embed ('Status' , f"```Server Name: **{SERVER_NAME}**\nPlayer Count: {PLAYER_NUM}```", YELLOW))
     else:
-        await ctx.send(embed = embed ('Status' , "```No server is running```", YELLOW))
+        await ctx.send(embed = embed ('Status' , "```No server is currently running```", YELLOW))
 
 #rename file
 @bot.command(aliases=['re', 'rename'])
@@ -205,9 +213,13 @@ async def _setting(ctx, index = '', line = '', txt = ''):
         else:
             await ctx.send(embed = embed('ERROR', read_settings(index)))
     elif txt == '':
-        await ctx.send(embed = embed('ERROR', read_settings(index, [line,''])))
+    	found, title = get_title(index)
+    	if found:
+    	    await ctx.send(embed = embed(title, read_settings(index, [line,''])))
+    	else:
+            await ctx.send(embed = embed('Error', read_settings(index, [line,'']), RED))
     else:
-        await ctx.send(embed = embed('ERROR', read_settings(index, [line, txt])))
+        await ctx.send(embed = embed('Error', read_settings(index, [line, txt], RED)))
 
 @bot.command(aliases=['l', 'log'])
 @commands.has_role(ADMIN_TAG)
@@ -233,7 +245,7 @@ async def _log(ctx, date=''):
                 await message.edit(embed = embed('Log', f'```{text}```', TEAL))
             time.sleep(3)
             await message.edit(embed = embed('Log', f'```{text}```'))
-    if date.isnumeric():
+    elif date.isnumeric():
         if int(date) < 7200:
             await ctx.send(embed = embed('Error', 'ERROR: Timer set is too long', RED))
             return
@@ -288,8 +300,9 @@ async def _temp(ctx):
 @bot.command()
 @commands.has_role(ADMIN_TAG)
 async def ip(ctx):
-    ip = get('https://api.ipify.org').text
-    await ctx.send('```Server IP: '+ip + '```')
+    #ip = get('https://api.ipify.org').text
+    #await ctx.send('```Server IP: '+ip + '```')
+    await ctx.send(embed = embed('ServerIP','fitssff.playit.gg',BLUE))
              
 async def create_list(ctx, title, full_txt, space = 20.0):
     text = full_txt.replace('```','').split('\n')
@@ -395,8 +408,11 @@ def set_game(index):
     global PROCESS, SERVER_NAME, START_UP
     found, title = get_title(index)
     if found:
-        file_location = MC_FILE_LOCATION + '\\' + title
-        PROCESS = subprocess.Popen(['java', '-jar', file_location + '\\server.jar'],cwd=file_location , stdout = subprocess.PIPE, stdin = subprocess.PIPE)
+        file_location = MC_FILE_LOCATION + '/' + title
+        if 'run.bat' in os.listdir(file_location):
+            PROCESS = subprocess.Popen(file_location + '/run.bat',cwd=file_location , stdout = subprocess.PIPE, stdin = subprocess.PIPE)
+        else:
+            PROCESS = subprocess.Popen(['java', '-jar', file_location + '/server.jar'],cwd=file_location , stdout = subprocess.PIPE, stdin = subprocess.PIPE)
         SERVER_NAME = title
         START_UP = False
         stdin_reader = threading.Thread(target=thread_running)
