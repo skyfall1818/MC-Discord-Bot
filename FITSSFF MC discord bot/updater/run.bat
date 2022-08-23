@@ -1,3 +1,3 @@
 @echo off
-python updater.py
-python updater.py rerun
+python update.py
+python update.py rerun
