@@ -5,11 +5,12 @@ import requests
 UPDATE_FILE = "updatefile.txt"
 
 def main():
+    file_type = ''
     if len(sys.argv) > 1 and sys.argv[1] == 'rerun':
         print('Running pro update')
         with open(UPDATE_FILE) as file:
             for line in file.readlines():
-                if line.rstrip == '':
+                if line.rstrip() == '':
                     continue
                 if file_type == 'POST:':
                     update_file(line)
@@ -18,7 +19,6 @@ def main():
     else:
         print('Running pre update')
         with open(UPDATE_FILE, 'r') as file:
-            file_type = ''
             for line in file.readlines():
                 if 'POST:' in line:
                     break
@@ -31,11 +31,11 @@ def main():
 def update_file(URL):
     file_name = get_same_file_dir(URL)
     x = requests.get(URL.rstrip())
-    print('\n updated: ' + file_name)
+    print('\nUpdating: ' + file_name)
     print('from: '+URL.rstrip())
-    with open(file_name, 'w') as text_file:
+    with open(file_name, 'w', encoding = 'utf-8') as text_file:
         s = x.text
-        text_file.write(s.replace('\r\n', '\n'))
+        text_file.write(s.rstrip())
 
 def get_same_file_dir(URL):
     path = os.getcwd()
