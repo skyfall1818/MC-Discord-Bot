@@ -5,7 +5,7 @@ import requests
 UPDATE_FILE = "updatefile.txt"
 
 def main():
-    if len(sys.argv) > 1 and sys.arg[1] == 'rerun':
+    if len(sys.argv) > 1 and sys.argv[1] == 'rerun':
         print('Running pro update')
         with open(UPDATE_FILE) as file:
             for line in file.readlines():
