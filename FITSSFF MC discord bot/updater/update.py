@@ -6,11 +6,17 @@ UPDATE_FILE = "updatefile.txt"
 
 def main():
     if len(sys.argv) > 1 and sys.arg[1] == 'rerun':
-        #with open(UPDATE_FILE) as file:
-            
-        x = requests.get('https://raw.githubusercontent.com/skyfall1818/MC-Discord-Bot/main/FITSSFF%20MC%20discord%20bot/updater/rerun.bat')
-        print(x.text)
+        print('Running pro update')
+        with open(UPDATE_FILE) as file:
+            for line in file.readlines():
+                if line.rstrip == '':
+                    continue
+                if file_type == 'POST:':
+                    update_file(line)
+                if 'POST:' in line:
+                    file_type = 'POST:'
     else:
+        print('Running pre update')
         with open(UPDATE_FILE, 'r') as file:
             file_type = ''
             for line in file.readlines():
@@ -20,17 +26,16 @@ def main():
                     update_file(line)
                 if 'PRE:' in line:
                     file_type = 'PRE:'
+            
 
 def update_file(URL):
-    #new_file = request.get(URL)
     file_name = get_same_file_dir(URL)
     x = requests.get(URL.rstrip())
-    print(URL.rstrip())
-    print('\n' + file_name + '\n')
+    print('\n updated: ' + file_name)
+    print('from: '+URL.rstrip())
     with open(file_name, 'w') as text_file:
         s = x.text
         text_file.write(s.replace('\r\n', '\n'))
-            
 
 def get_same_file_dir(URL):
     path = os.getcwd()
@@ -54,4 +59,3 @@ def test():
     
 if __name__ == "__main__":
     main()
-    #test()
