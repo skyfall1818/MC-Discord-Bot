@@ -1,1 +1,2 @@
-echo "Hello World"
+@echo off
+python updater.py rerun
