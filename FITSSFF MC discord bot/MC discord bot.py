@@ -211,15 +211,15 @@ async def _setting(ctx, index = '', line = '', txt = ''):
         if found:
             await create_list(ctx, f'Settings - {title}', read_settings(index))
         else:
-            await ctx.send(embed = embed('ERROR', read_settings(index)))
+            await ctx.send(embed = embed('Error', read_settings(index)))
     elif txt == '':
-    	found, title = get_title(index)
-    	if found:
-    	    await ctx.send(embed = embed(title, read_settings(index, [line,''])))
-    	else:
+        found, title = get_title(index)
+        if found:
+            await ctx.send(embed = embed(title, read_settings(index, [line,''])))
+        else:
             await ctx.send(embed = embed('Error', read_settings(index, [line,'']), RED))
     else:
-        await ctx.send(embed = embed('Error', read_settings(index, [line, txt], RED)))
+        await ctx.send(embed = embed('Error', read_settings(index, [line, txt]), RED))
 
 @bot.command(aliases=['l', 'log'])
 @commands.has_role(ADMIN_TAG)
@@ -303,7 +303,24 @@ async def ip(ctx):
     #ip = get('https://api.ipify.org').text
     #await ctx.send('```Server IP: '+ip + '```')
     await ctx.send(embed = embed('ServerIP','fitssff.playit.gg',BLUE))
-             
+
+@bot.command()
+@commands.has_role(ADMIN_TAG)
+async def update(ctx):
+    if check_running():
+        await ctx.send(embed = embed('Error','ERROR: server is still running', RED))
+        return
+    message = await ctx.send(embed = embed('Updating...','', YELLOW))
+    try:
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        print(dir_path)
+        PROCESS = subprocess.run(dir_path + '/updater/run.bat',cwd= dir_path + '/updater' , stdout = subprocess.PIPE, stdin = subprocess.PIPE)
+        await message.edit(embed = embed('Finished Update','Restarting...', GREEN))
+        PROCESS = subprocess.Popen('run.bat', stdout = subprocess.PIPE, stdin = subprocess.PIPE)
+        exit()
+    except Exception as e:
+        await message.edit(embed = embed('ERROR:',str(e), RED))
+    
 async def create_list(ctx, title, full_txt, space = 20.0):
     text = full_txt.replace('```','').split('\n')
     pages = []
@@ -462,7 +479,7 @@ def thread_running():
                 write_to_log_file(txt + '\n')
             if 'Stopping server' in txt:
                 START_UP = False'''
-                
+       
             LOG[LOG_PT] = txt
             if '<' not in LOG[LOG_PT] and 'joined the game' in LOG[LOG_PT]:
                 PLAYER_NUM += 1

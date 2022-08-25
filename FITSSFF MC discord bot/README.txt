@@ -41,10 +41,13 @@
  'setting [index]'
  'set [index]'
  
- Change server sttings
+ Change server settings
  'setting [index] [line number] [new variable (can be left blank)]'
  'set [index] [line number] [new variable (can be left blank)]'
 
  get CPU temperature
  'temperature'
  'temp'
+ 
+ update server
+ 'update'
