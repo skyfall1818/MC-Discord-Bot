@@ -1,8 +1,7 @@
-import discord # need pipinstall
 import os
 import os.path
 import sys
-import subprocess # need pip install i think
+import subprocess
 import threading
 import time
 import math

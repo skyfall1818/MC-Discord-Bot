@@ -1,8 +1,8 @@
 async function sendMessage() {
     const message = document.getElementById('messageInput').value;
     const statusArea = document.getElementById('statusArea');
-    const serverIp = 'your-server-ip';
-    const serverPort = 'port';
+    const serverIp = '192.168.1.101';
+    const serverPort = '5000';
     // Replace with your server's actual HTTPS IP and endpoint
     const serverUrl = 'https://' + serverIp + ':' + serverPort + '/api/messages';
 
