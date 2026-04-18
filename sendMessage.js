@@ -4,7 +4,7 @@ async function sendMessage() {
     const serverIp = '192.168.1.101';
     const serverPort = '5000';
     // Replace with your server's actual HTTPS IP and endpoint
-    const serverUrl = 'https://' + serverIp + ':' + serverPort + '/api/messages';
+    const serverUrl = 'http://' + serverIp + ':' + serverPort + '/message';
 
     if (!message) {
         statusArea.textContent = 'Message cannot be empty.';
@@ -17,17 +17,22 @@ async function sendMessage() {
             headers: {
                 'Content-Type': 'application/json' // Indicate JSON data
             },
-            body: JSON.stringify({ secureMessage: message }) // Send the data as a JSON string
-        });
+            body: JSON.stringify({ 
+                name: "Test",
+                description: "Test",
+                message: message
+            }) // Send the data as a JSON string
+        })
 
+        console.log('Response:', response);
         if (response.ok) {
-            const result = await response.json();
-            statusArea.textContent = 'Message sent securely: ' + result.status;
+            const data = await response.json();
+            statusArea.textContent = data.reply;
         } else {
-            statusArea.textContent = 'Failed to send message. Status: ' + response.status;
+            statusArea.textContent = 'Error sending message.';
         }
     } catch (error) {
         console.error('Error sending message:', error);
-        statusArea.textContent = 'Error connecting to the secure server.';
+        statusArea.textContent = 'Error connecting to the server.';
     }
 }
