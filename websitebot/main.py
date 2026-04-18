@@ -1,8 +1,25 @@
-import MC_discord_bot
-
+#import MC_discord_bot
+import socket
+import time
 from flask import Flask, request, jsonify
 
+def get_local_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # This address doesn't need to be reachable
+        s.connect(('8.8.8.8', 1))
+        ip = s.getsockname()[0]
+    except Exception:
+        ip = '127.0.0.1'
+    finally:
+        s.close()
+    return ip
+
+hostname = socket.gethostname()
+local_ip = get_local_ip()
+
 app = Flask(__name__)
+
 
 @app.route('/message', methods=['POST'])
 def handle_message():
@@ -27,14 +44,30 @@ def handle_message():
 
     else:
         # Handle non-JSON requests
+        print("non json file!")
         return jsonify({
             "status": "error",
             "message": "Request must be JSON"
         }), 400 # 400 Bad Request status code
 
+@app.route("/")
+def home():
+    return "Home"
+
+@app.route("/get-user/<user_id>")
+def get_user(user_id):
+    user_data = {
+        "user_id": user_id,
+        "name": "John Doe",
+        "email": "TEST@example.com"
+    }
+    return jsonify(user_data), 200
+
 if __name__ == '__main__':
     # Run the server on http://localhost:5000
-    app.run(debug=True, port=5000)
+    print(f"Running on: {hostname}")
+    print(f"Local IP: {local_ip}")
+    app.run(debug=True, host=local_ip, port=5000)
 
 
 
