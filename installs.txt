@@ -1,1 +1,3 @@
 flask
+-U flask-cors
+pyOpenSSL

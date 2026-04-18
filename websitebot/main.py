@@ -2,6 +2,7 @@
 import socket
 import time
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 def get_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -19,7 +20,8 @@ hostname = socket.gethostname()
 local_ip = get_local_ip()
 
 app = Flask(__name__)
-
+# This handles preflight (OPTIONS) requests automatically for all routes
+CORS(app)
 
 @app.route('/message', methods=['POST'])
 def handle_message():
