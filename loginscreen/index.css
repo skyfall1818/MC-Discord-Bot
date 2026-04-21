@@ -1,0 +1,108 @@
+.api-control-container1 {
+  width: 100%;
+  min-height: 100vh;
+}
+ 
+.api-control-thq-api-control-panel-elm {
+  height: 999px;
+}
+ 
+.api-control-thq-login-form-elm {
+  gap: 24px;
+  margin: 0 auto;
+  display: flex;
+  max-width: 400px;
+  flex-direction: column;
+}
+ 
+.api-control-thq-api-control-panelgroup-elm1 {
+  gap: 8px;
+  display: flex;
+  flex-direction: column;
+}
+ 
+.api-control-text1 {
+  color: var(--api-text-dim);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+ 
+.api-control-thq-api-control-panelinput-elm1 {
+  width: 100%;
+}
+ 
+.api-control-thq-api-control-panelgroup-elm2 {
+  gap: 8px;
+  display: flex;
+  flex-direction: column;
+}
+ 
+.api-control-text2 {
+  color: var(--api-text-dim);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+ 
+.api-control-thq-api-control-panelinput-elm2 {
+  width: 100%;
+}
+ 
+.api-control-thq-login-error-elm {
+  color: var(--api-stop);
+  display: none;
+  font-size: 0.85rem;
+  text-align: center;
+}
+ 
+.api-control-thq-api-control-panelbtn-elm {
+  width: 100%;
+  margin-top: 8px;
+}
+ 
+.api-control-container2 {
+  display: none;
+}
+ 
+.api-control-container3 {
+  display: contents;
+}
+ 
+.api-control-container4 {
+  display: none;
+}
+ 
+.api-control-container5 {
+  display: contents;
+}
+ 
+.api-control-container6 {
+  right: 50px;
+  border: 1px solid #ffffff5c;
+  bottom: 30px;
+  display: flex;
+  z-index: 22;
+  position: fixed;
+  box-shadow: 5px 5px 10px 0px rgba(31, 31, 31, 0.4);
+  min-height: auto;
+  align-items: center;
+  padding-top: 8px;
+  padding-left: 12px;
+  border-radius: 8px;
+  padding-right: 12px;
+  padding-bottom: 8px;
+  backdrop-filter: blur(6px);
+  background-color: rgba(41, 41, 41, 0.41);
+}
+ 
+.api-control-icon1 {
+  width: 24px;
+  margin-right: 4px;
+}
+ 
+.api-control-text4 {
+  color: white;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+}

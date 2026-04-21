@@ -1,13 +1,13 @@
-async function sendMessage() {
-    const message = document.getElementById('messageInput').value;
-    const statusArea = document.getElementById('statusArea');
-    const serverIp = '192.168.1.101';
+
+async function sendMessage(message) {
+    const serverIp = '192.168.1.100';
     const serverPort = '5000';
-    // Replace with your server's actual HTTPS IP and endpoint
-    const serverUrl = 'http://' + serverIp + ':' + serverPort + '/message';
+    const serverUrl = 'https://' + serverIp + ':' + serverPort + '/message';
+    const token = localStorage.getItem("apiToken")
+    const ws_id = localStorage.getItem("ws_id")
 
     if (!message) {
-        statusArea.textContent = 'Message cannot be empty.';
+        console.log('Message cannot be empty.');
         return;
     }
 
@@ -18,8 +18,8 @@ async function sendMessage() {
                 'Content-Type': 'application/json' // Indicate JSON data
             },
             body: JSON.stringify({ 
-                name: "Test",
-                description: "Test",
+                token: token,
+                ws_id: ws_id,
                 message: message
             }) // Send the data as a JSON string
         })
@@ -27,12 +27,13 @@ async function sendMessage() {
         console.log('Response:', response);
         if (response.ok) {
             const data = await response.json();
-            statusArea.textContent = data.reply;
+            logToConsole(data.reply, 'info');
         } else {
-            statusArea.textContent = 'Error sending message.';
+            logToConsole('Error sending message.', 'error');
         }
     } catch (error) {
         console.error('Error sending message:', error);
-        statusArea.textContent = 'Error connecting to the server.';
+        set_connection_status(false);
+        logToConsole('Error sending message: ' + error, 'error');
     }
 }

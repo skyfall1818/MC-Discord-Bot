@@ -1,0 +1,68 @@
+.api-control-container1 {
+  width: 100%;
+  min-height: 100vh;
+}
+ 
+.api-control-thq-api-control-panelgrid-elm {
+  height: 284px;
+}
+ 
+.api-control-container2 {
+  flex: 0 0 auto;
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+ 
+.api-control-thq-api-control-panelbtn-elm6 {
+  width: 116px;
+}
+ 
+.api-control-container3 {
+  display: none;
+}
+ 
+.api-control-container4 {
+  display: contents;
+}
+ 
+.api-control-container5 {
+  display: none;
+}
+ 
+.api-control-container6 {
+  display: contents;
+}
+ 
+.api-control-container7 {
+  right: 50px;
+  border: 1px solid #ffffff5c;
+  bottom: 30px;
+  display: flex;
+  z-index: 22;
+  position: fixed;
+  box-shadow: 5px 5px 10px 0px rgba(31, 31, 31, 0.4);
+  min-height: auto;
+  align-items: center;
+  padding-top: 8px;
+  padding-left: 12px;
+  border-radius: 8px;
+  padding-right: 12px;
+  padding-bottom: 8px;
+  backdrop-filter: blur(6px);
+  background-color: rgba(41, 41, 41, 0.41);
+}
+ 
+.api-control-icon1 {
+  width: 24px;
+  margin-right: 4px;
+}
+ 
+.api-control-text23 {
+  color: white;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+}
