@@ -1,3 +1,6 @@
 flask
 -U flask-cors
 pyOpenSSL
+flask-socketio
+flask-sock
+PyJWT

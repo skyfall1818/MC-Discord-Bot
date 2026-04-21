@@ -6,9 +6,10 @@ import threading
 import time
 import math
 import asyncio
+from Message_Queuing import Message_Queue
 from datetime import date
 #from requests import get
-import psutil #need pip install
+#import psutil #need pip install
 import http.server
 import ssl
 import urllib.request
@@ -21,7 +22,8 @@ README = 'README.txt'
 ADMIN_TAG = ''
 SERVER_NAME = ''
 PROCESS = None
-GAME_LOG_LENGTH = 40
+GAME_LOG_LENGTH = 200
+START_UP_TIMEOUT = 30
 LOG = ['' for _ in range(GAME_LOG_LENGTH)]
 LOG_PT = 0
 
@@ -33,116 +35,98 @@ START_UP = False
 
 TIMER_ON = False
 
-def messageFormatter(title, message, replace = False):
-    return f'**{title}**\n{message}'
-
 with open(KEY_FILE, "r") as file:
     for line in file:
         try:
             name, val = line.split('|')
             if val != '' and val != ' ':
-                if name == 'Token':
-                    TOKEN = val.replace('\n','')
-                elif name == 'MC File':
+                if name == 'Game File':
                     MC_FILE_LOCATION = val.replace('\n','')
-                elif name == 'Char Key':
-                    KEYWORD = val.replace('\n','')
-                elif name == 'Admin Tag':
-                    ADMIN_TAG = val.replace('\n','')
+                    print(f"setting MC File location to {MC_FILE_LOCATION}")
         except:
             print("Error: cannot split line")
 
-async def on_ready():
-    guild_count = 0
-    # LOOPS THROUGH ALL THE GUILD / SERVERS THAT THE BOT IS ASSOCIATED WITH.
-    for guild in bot.guilds:
-        print(f"- {guild.id} (name: {guild.name})")
-    	# INCREMENTS THE GUILD COUNTER.
-        guild_count = guild_count + 1
-	# PRINTS HOW MANY GUILDS / SERVERS THE BOT IS IN.
-        print("SampleDiscordBot is in " + str(guild_count) + " guilds.")
-# EVENT LISTENER FOR WHEN A NEW MESSAGE IS SENT TO A CHANNEL.
+##################
+# API functions
+##################
 
-async def help(Message_Manager):
+def help(Message_Manager):
     text=''
     with open(README, 'r') as f:
         text = f.read()
-    await 'Help','```' + text +'```'
+    Message_Manager.Enqueue('Help',text)
 
-async def _run(Message_Manager, index = ''):
+def run(Message_Manager, index = ''):
+    global START_UP_TIMEOUT, START_UP
     if index == '':
-        await list_games(Message_Manager)
+        list_games(Message_Manager)
     else:
         out, title= set_game(index)
         if out:
-
-            message = messageFormatter(f'Starting Server - **{title}**', f'```Loading...```')
-            new_message = await Message_Manager.send(message)
-            
+            print(f'Starting Server - {title}')
+            Message_Manager.Enqueue(f'Starting Server - {title}', f'Loading...')
+            start_time = time.time()
             out_line = get_std_out_line()
-            while check_running() and '%' not in out_line:
+            while check_running() and '%' not in out_line and time.time() - start_time < START_UP_TIMEOUT:
                 if ']: ' in out_line:
                     out_line = out_line.split(']: ')[1]
                 if len(out_line) > 70:
                     out_line = out_line[:67] + '...'
 
-                message = messageFormatter(f'Starting Server - **{title}**', f'```{out_line}```')
-                await new_message.edit(embed = em)
+                Message_Manager.Enqueue(f'Starting Server - {title}', f'{out_line}')
                 
                 time.sleep(0.1)
                 out_line = get_std_out_line()
-            while check_running() and '%' in out_line:
+
+            while check_running() and '%' in out_line and time.time() - start_time < START_UP_TIMEOUT:
                 if ']: ' in out_line:
                     out_line = out_line.split(']: ')[1]
                 if len(out_line) > 70:
                     out_line = out_line[:67] + '...'
 
-                message =(f'Starting Server - **{title}**', f'```{out_line}```')
-                await new_message.edit(embed = em)
+                Message_Manager.Enqueue(f'Starting Server - {title}', f'{out_line}')
                 
                 time.sleep(0.05)
                 out_line = get_std_out_line()
             if check_running():
+                print("Done!")
                 START_UP = True
-                message =(f'Starting Server - **{title}**', f'```Done!```')
-                await new_message.edit(embed = em)
+                Message_Manager.Enqueue(f'Starting Server - {title}', f'Done!')
             else:
-                await Message_Manager.send(messageHandler('Error', 'ERROR: server crashed on startup. check your settings', RED))
+                Message_Manager.Enqueue(f'Starting Server - {title} Error', 'ERROR: server crashed on startup. check your settings')
         else:
-            await Message_Manager.send(embed = embed('Error', 'ERROR: did not find folder', RED))
+            print(f'ERROR: did not find folder')
+            Message_Manager.Enqueue('Error', 'ERROR: did not find folder')
 
-async def _stop(Message_Manager):
-    global PROCESS
+def stop(Message_Manager):
+    global PROCESS, SERVER_NAME
     PROCESS.stdin.write('stop\n'.encode())
     PROCESS.stdin.flush()
     out_line = get_std_out_line()
-    message =(f'Closing Server - **{SERVER_NAME}**', f'```Loading...```', ORANGE)
-    new_message = await Message_Manager.send(embed = em)
+    print(SERVER_NAME)
+    Message_Manager.Enqueue(f'Closing Server - {SERVER_NAME}', 'Closing Server - {SERVER_NAME}...')
     while check_running():
         if ']: ' in out_line:
             out_line = out_line.split(']: ')[1]
         if len(out_line) > 70:
             out_line = out_line[:67] + '...'
             
-        #await new_message.edit(content = '```' + out_line + '```')
-        message =(f'Closing Server - **{SERVER_NAME}**', f'```{out_line}```', ORANGE)
-        await new_message.edit(embed = em)
+        Message_Manager.Enqueue(f'Closing Server - {SERVER_NAME}', f'{out_line}')
         
         time.sleep(0.05)
         out_line = get_std_out_line()
-    message =(f'Closing Server - **{SERVER_NAME}**', f'```Server Closed```', RED)
-    await new_message.edit(embed = em)
+    Message_Manager.Enqueue(f'Closing Server - {SERVER_NAME}', f'Server Closed')
 
-async def status(Message_Manager):
+def status(Message_Manager):
     out = check_running()
     if out:
-       return ('Status' , f"```Server Name: **{SERVER_NAME}**\nPlayer Count: {PLAYER_NUM}```")
+       Message_Manager.Enqueue('Status' , f"Server Name: {SERVER_NAME}\nPlayer Count: {PLAYER_NUM}")
     else:
-       return ('Status' , "```No server is currently running```")
+       Message_Manager.Enqueue('Status' , "No server is currently running")
 
-async def _rename(Message_Manager, index = '', name = ''):
+def rename(Message_Manager, index = '', name = ''):
     if index == '':
-        await list_games(Message_Manager)
+        list_games(Message_Manager)
     elif name == '':
         return ('Error', 'ERROR: invalid command')
     else:
@@ -152,7 +136,7 @@ async def _rename(Message_Manager, index = '', name = ''):
         else:
             return ('Error', text)
 
-async def _command(Message_Manager, *, msg=''):
+def command(Message_Manager, msg=''):
     if not check_running():
         return ('Error', 'ERROR: no server detected')
     else:
@@ -169,55 +153,45 @@ async def _command(Message_Manager, *, msg=''):
             log = f'[day_time] [{Message_Manager.author.name}:{Message_Manager.author.id}, command]: {command}'
             #write_to_log_file(log)
             output = returning_input()
-            return ('Command',f'```{output}```')
+            return ('Command',f'{output}')
         except Exception as e:
             print(e)
 
-async def _log(Message_Manager, date=''):
+def log(Message_Manager, date=''):
     global LOG_PT, TIMER_ON
     if date == '':
         if not check_running():
-            await Message_Manager.send(embed = embed('Error', 'ERROR: no server detected', RED))
+            Message_Manager.Enqueue('Error', 'ERROR: no server detected')
             return 
         TIMER_ON = True
-        message = await Message_Manager.send(embed = embed('Log', '```Loading...```', TEAL))
+        Message_Manager.Enqueue('Log', 'Loading...')
         stdin_reader = threading.Thread(target=start_timer, args=[30])
         stdin_reader.start()
-        current_pt = -1
-        text = ''
+        current_pt = (LOG_PT - 20) % GAME_LOG_LENGTH
         while TIMER_ON:
-            if current_pt != LOG_PT:
-                current_pt = (LOG_PT - 20) % GAME_LOG_LENGTH
-                text = ''
-                while current_pt != LOG_PT:
-                    text += LOG[current_pt]
-                    current_pt = (current_pt + 1) % GAME_LOG_LENGTH
-                await message.edit(embed = embed('Log', f'```{text}```', TEAL))
+            while current_pt != LOG_PT:
+                text = LOG[current_pt] + '\n'
+                Message_Manager.Enqueue('Log', f'{text}')
+                current_pt = (current_pt + 1) % GAME_LOG_LENGTH
             time.sleep(3)
-            await message.edit(embed = embed('Log', f'```{text}```'))
     elif date.isnumeric():
         if int(date) < 7200:
-            await Message_Manager.send(embed = embed('Error', 'ERROR: Timer set is too long', RED))
+            Message_Manager.Enqueue('Error', 'ERROR: Timer set is too long')
             return
         if not check_running():
-            await Message_Manager.send(embed = embed('Error', 'ERROR: no server detected', RED))
+            Message_Manager.Enqueue('Error', 'ERROR: no server detected')
             return
         TIMER_ON = True
-        message = await Message_Manager.send(embed = embed('Log', '```Loading...```', TEAL))
+        Message_Manager.Enqueue('Log', 'Loading...')
         stdin_reader = threading.Thread(target=start_timer, args=[int(date)])
         stdin_reader.start()
-        current_pt = -1
-        text = ''
+        current_pt = (LOG_PT - 20) % GAME_LOG_LENGTH
         while TIMER_ON:
-            if current_pt != LOG_PT:
-                current_pt = (LOG_PT - 20) % GAME_LOG_LENGTH
-                text = ''
-                while current_pt != LOG_PT:
-                    text += LOG[current_pt]
-                    current_pt = (current_pt + 1) % GAME_LOG_LENGTH
-                await message.edit(embed = embed('Log', f'```{text}```', TEAL))
+            while current_pt != LOG_PT:
+                text = LOG[current_pt] + '\n'
+                Message_Manager.Enqueue('Log', f'{text}')
+                current_pt = (current_pt + 1) % GAME_LOG_LENGTH
             time.sleep(3)
-        await message.edit(embed = embed('Log', f'```{text}```'))
     elif date.count('-') == 2 or date.count('/') == 2:
         div = '/'
         if date.count('-') == 2:
@@ -234,32 +208,29 @@ async def _log(Message_Manager, date=''):
             file_name = f'Log/{file_date}'
             print('finding: ' + file_name)
             if os.path.exists(file_name):
-                await Message_Manager.send(embed = embed('Opening Log - ' + file_date, '', BLUE),file=discord.File(file_name))
+                Message_Manager.Enqueue('Opening Log - ' + file_date, '')
             else:
-                await Message_Manager.send(embed = embed('Error', f'ERROR: did not find file for {date}', RED))
+                Message_Manager.Enqueue('Error', f'ERROR: did not find file for {date}')
         else:
-            await Message_Manager.send(embed = embed('Error', f'ERROR: did not find file for {date}', RED))
+            Message_Manager.Enqueue('Error', f'ERROR: did not find file for {date}')
     else:
-        await Message_Manager.send(embed = embed('Error', f'ERROR: invalid command', RED))
+        Message_Manager.Enqueue('Error', f'ERROR: invalid command')
 
-async def _temp(Message_Manager):
-    return ('Temperature :',get_cpu_temp())
-
-async def ip(Message_Manager):
+def ip(Message_Manager):
     return ("IP Address: ",str(urllib.request.urlopen('https://ident.me').read().decode('utf8')))
-           
-async def list_games():
-    txt = "```"
+
+##################
+# helper functions
+##################
+
+def list_games(Message_Manager):
+    txt = ""
     count = 0
     for i,f in enumerate(os.listdir(MC_FILE_LOCATION)):
         txt += f'{i+1}: {f}\n'
         count = i
-    txt += '```'
-    return ('Choose Server:', txt)
-    
-def get_cpu_temp():
-    temp = psutil.sensors_temperatures(fahrenheit=True)
-    return f'C: {str(temp)}'
+    txt += ''
+    Message_Manager.Enqueue('Server List', txt)
 
 def get_std_out_line():
     index = LOG_PT - 1
@@ -292,7 +263,7 @@ def rename_game(file_input):
     if found:
         if not check_running() or SERVER_NAME != title:
             os.rename(MC_FILE_LOCATION + '\\' + title, MC_FILE_LOCATION + '\\' + new_name)
-            return True, f'Successfully changed **{title}** to **{new_name}**'
+            return True, f'Successfully changed {title} to {new_name}'
         else:
             return False, 'ERROR: server is curently running'
     return False, f'ERROR: did not find "{index}"'
@@ -301,11 +272,16 @@ def set_game(index):
     global PROCESS, SERVER_NAME, START_UP
     found, title = get_title(index)
     if found:
-        file_location = MC_FILE_LOCATION + '/' + title
-        if 'run.bat' in os.listdir(file_location):
-            PROCESS = subprocess.Popen(file_location + '/run.bat',cwd=file_location , stdout = subprocess.PIPE, stdin = subprocess.PIPE)
+        file_location = MC_FILE_LOCATION + '\\' + title
+        file_run = ''
+        with open(file_location + '\\runapplication.txt', 'r') as temp:
+            file_run = temp.readline()
+        if '.jar' in file_run:
+            PROCESS = subprocess.Popen(['java', '-jar', file_location + '\\' + file_run],cwd=file_location , stdout = subprocess.PIPE, stdin = subprocess.PIPE)
+        elif '.bat' in file_run:
+            PROCESS = subprocess.Popen(file_location + '\\' + file_run, cwd=file_location, stdout = subprocess.PIPE, stdin = subprocess.PIPE)
         else:
-            PROCESS = subprocess.Popen(['java', '-jar', file_location + '/server.jar'],cwd=file_location , stdout = subprocess.PIPE, stdin = subprocess.PIPE)
+            return False, ''
         SERVER_NAME = title
         START_UP = False
         stdin_reader = threading.Thread(target=thread_running)
@@ -390,22 +366,22 @@ def read_settings(index, context = None):
         elif os.path.isfile(filename + '/server.txt'):
             filename += '/server.txt'
         else:
-            return f'Error: cannot find settings in **{title}** '
+            return f'Error: cannot find settings in {title} '
 
         text = ''
         if context:
             return write_settings(title, filename, context)
         else:
             with open(filename,'r') as file_read:
-                text += '```'
-                counter = 1;
+                text += ''
+                counter = 1
                 for line in file_read.readlines():
                     if '=' in line:
                         text += f'{counter}:{line}'
                         counter += 1
                     else :
                         text += line
-                text += '```'
+                text += ''
         return text
     return f'Error: did not find folder'
 
@@ -445,12 +421,12 @@ def write_settings(title, filename, context):
         prev_val = '___'
     if SETTINGS[name] == '':
         SETTINGS[name] = '___'
-    return f'Sucessfully changed **{name}** from **{prev_val}** to **{SETTINGS[name]}** in **{title}**'
+    return f'Sucessfully changed {name} from {prev_val} to {SETTINGS[name]} in {title}'
 
 def get_readme():
     readme_file = open(README)
     text = ''.join(readme_file.readlines())
-    return '```' + text + '```'
+    return '' + text + ''
 
 def start_timer(length):
     global TIMER_ON
@@ -460,28 +436,38 @@ def start_timer(length):
     finally:
         TIMER_ON = False
 
-# ========================================
-# Receiver code
-# ========================================
-
-# Define the handler to process incoming requests
-class SimpleHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
-    def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        print(f"Received: {post_data.decode('utf-8')}")
-        self.send_response(200)
-        self.end_headers()
-        self.wfile.write(b"Data received successfully")
-
-# Set up the server
-server_address = ('localhost', 4443)
-httpd = http.server.HTTPServer(server_address, SimpleHTTPRequestHandler)
-
-# Wrap the socket with SSL
-context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-context.load_cert_chain(certfile="cert.pem", keyfile="key.pem")
-httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
-
-print("Serving HTTPS on localhost:4443...")
-httpd.serve_forever()
+##################
+# Message handler
+##################
+def message_handler(MQ, *args):
+    subargs = None
+    main = None
+    if len(args) > 1:
+        main = args[0]
+        subargs = args[1:]
+    else:
+        main = args[0]
+    
+    MQ.start_sending()
+    if main == "help":
+        print("running help")
+        help(MQ)
+    elif main == "run":
+        if subargs:
+            run(MQ, subargs[0])
+        else:
+            run(MQ)
+    elif main == "stop":
+        stop(MQ)
+    elif main == "status":
+        status(MQ)
+    elif main == "command":
+        command(MQ, msg = " ".join(subargs))
+    elif main == "ip":
+        ip(MQ)
+    elif main == "log":
+        log(MQ)
+    else:
+        print(f"Error: Unkown command '{main}'")
+    MQ.done_sending()
+    print('finish handling request')
