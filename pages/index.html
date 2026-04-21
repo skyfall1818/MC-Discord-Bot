@@ -1,12 +1,142 @@
 <!DOCTYPE html>
-<html>
-<body>
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Enter Username">
-    <input type="text" id="password" placeholder="Enter Password">
-    <button onclick="login()">Login</button>
-    <p id="statusArea"></p>
+<html lang="en">
+  <head>
+    <title>MC API Login</title>
+    <meta property="og:title" content="MC API Login" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <meta property="twitter:card" content="summary_large_image" />
 
-    <script src="sendlogin.js"></script>
-</body>
+    <style data-tag="reset-style-sheet">
+      html {  line-height: 1.15;}body {  margin: 0;}* {  box-sizing: border-box;  border-width: 0;  border-style: solid;  -webkit-font-smoothing: antialiased;}p,li,ul,pre,div,h1,h2,h3,h4,h5,h6,figure,blockquote,figcaption {  margin: 0;  padding: 0;}button {  background-color: transparent;}button,input,optgroup,select,textarea {  font-family: inherit;  font-size: 100%;  line-height: 1.15;  margin: 0;}button,select {  text-transform: none;}button,[type="button"],[type="reset"],[type="button"]::-moz-focus-inner,[type="reset"]::-moz-focus-inner,[type="button"]:-moz-focus,[type="reset"]:-moz-focus
+    </style>
+    <style data-tag="default-style-sheet">
+      html {
+        font-family: Inter;
+        font-size: 16px;
+      }
+
+      body {
+        font-weight: 400;
+        font-style:normal;
+        text-decoration: none;
+        text-transform: none;
+        letter-spacing: normal;
+        line-height: 1.15;
+        color: var(--dl-color-theme-neutral-dark);
+        background: var(--dl-color-theme-neutral-light);
+
+        fill: var(--dl-color-theme-neutral-dark);
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/animate.css@4.1.1/animate.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+      data-tag="font"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@teleporthq/teleport-custom-scripts/dist/style.css"
+    />
+  </head>
+  <body>
+    <link rel="stylesheet" href="./style.css" />
+    <div>
+      <link href="./index.css" rel="stylesheet" />
+
+      <div class="api-control-container1">
+        <section
+          class="api-control-thq-api-control-panel-elm api-control-panel"
+        >
+          <div class="api-control-panel__container">
+            <div class="api-control-panel__glass-card">
+              <div class="api-control-panel__header">
+                <h1 class="api-control-panel__title">Login</h1>
+              </div>
+              <form
+                data-form-id="49a22194-7c0b-4a3d-a67f-fc1fe5d27826"
+                class="api-control-thq-login-form-elm"
+              >
+                <div
+                  class="api-control-thq-api-control-panelgroup-elm1 api-control-panel__group"
+                >
+                  <label for="username" class="api-control-text1">
+                    Username
+                  </label>
+                  <div class="api-control-panel__input-wrapper">
+                    <input
+                      type="text"
+                      id="username"
+                      name="username"
+                      placeholder="Enter username"
+                      data-form-field-id="username"
+                      class="api-control-thq-api-control-panelinput-elm1 api-control-panel__input input"
+                    />
+                  </div>
+                </div>
+                <div
+                  class="api-control-thq-api-control-panelgroup-elm2 api-control-panel__group"
+                >
+                  <label for="password" class="api-control-text2">
+                    Password
+                  </label>
+                  <div class="api-control-panel__input-wrapper">
+                    <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      placeholder="Enter password"
+                      data-form-field-id="password"
+                      class="api-control-thq-api-control-panelinput-elm2 api-control-panel__input input"
+                    />
+                  </div>
+                </div>
+                <div
+                  id="error-message"
+                  data-error-message="true"
+                  class="api-control-thq-login-error-elm"
+                >
+                  <span>Invalid username or password</span>
+                </div>
+                <script src = "sendlogin.js"></script>
+                <button
+                  type="button"
+                  id="login-button"
+                  class="api-control-thq-api-control-panelbtn-elm api-control-panel__btn api-control-panel__btn--run button"
+                  onclick="login()"
+                >
+                  Login
+                </button>
+
+              </form>
+            </div>
+          </div>
+        </section>
+        <div class="api-control-container2">
+          <div class="api-control-container3">
+            <style>
+                      @keyframes api-pulse {0%,100% {opacity: 1;
+              transform: scale(1);}
+              50% {opacity: 0.5;
+              transform: scale(1.2);}}
+            </style>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

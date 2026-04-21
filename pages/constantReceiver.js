@@ -1,18 +1,8 @@
 // Connect to the WebSocket server
-const messageLog = document.getElementById('messages');
-const headerLog = document.getElementById('header');
-const ws = new WebSocket('wss://192.168.1.101:5000/ws/1234?');
+const ws_id = localStorage.getItem("ws_id")
+const ws = new WebSocket('wss://192.168.1.100:5000/ws/' + ws_id + '?');
+const headerLog = document.getElementById('console-meta');
 ws.onopen = () => {
-    /*const message = {
-        method: 'GET', // Use POST method to send data in the body
-        headers: {
-            'Content-Type': 'application/json' // Indicate JSON data
-        },
-        body: JSON.stringify({ 
-            data: 'Hello from the client!',
-            WS_ID: '1234'
-        })
-    }*/
     console.log('Connected to server');
 };
 
@@ -27,12 +17,13 @@ ws.onmessage = (event) => {
     const Body = output.MESSAGE;
     console.log('Received:', Header);
     headerLog.textContent = Header;
-    messageLog.textContent += Body;
+    logToConsole(Body, 'info');
     // Process your constant data here (e.g., updating UI)
 };
 
 // Handle errors
 ws.onerror = (error) => {
+    set_connection_status(false);
     console.error('WebSocket error:', error);
 };
 

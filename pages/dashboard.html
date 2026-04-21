@@ -1,39 +1,8 @@
-<!-- This is a comment in the source -->
-<h3>Welcome to the free online <span style="background-color: #914c53; color: #ffffff; padding: 0 3px;">HTML Code Editor</span></h3>
-<p><strong>Compose the content in the source editor on the left and see the preview changing instantly on the right as you're typing.</strong></p>
-<p>Use the bar above the editor to create new HTML elements. Explore the cleaning features, the tag wizard and many other integrated fratures that make web code composing really easy <img src="https://htmlcodeeditor.com/images/smiley.png" alt="smiley" /></p>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Secure Messaging</title>
-</head>
-<body>
-    <h2>Send a Secure Message</h2>
-    <input type="text" id="messageInput" placeholder="Enter message">
-    <button onclick="sendMessage()">Send</button>
-    <p id="statusArea"></p>
-
-    <script src="sendMessage.js"></script>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html>
-<body>
-    <h2>Live WSS Data</h2>
-    <div id="header" style="height: 40px; border: 1px solid #ccc; padding: 10px; font-size: 30px; font-family: Verdana, Geneva, Tahoma, sans-serif;"></div>
-    <div id="messages" style="height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; white-space: pre-line;"></div>
-    <script src="constantReceiver.js"></script>
-</body>
-</html>
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Grouchy Sunny Manatee</title>
-    <meta property="og:title" content="Grouchy Sunny Manatee" />
+    <title>API Window</title>
+    <meta property="og:title" content="API Window" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="utf-8" />
     <meta property="twitter:card" content="summary_large_image" />
@@ -85,9 +54,9 @@
     />
   </head>
   <body>
-    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./DBstyle.css" />
     <div>
-      <link href="./index.css" rel="stylesheet" />
+      <link href="./DB.css" rel="stylesheet" />
 
       <div class="api-control-container1">
         <section class="api-control-panel">
@@ -96,9 +65,9 @@
               <div class="api-control-panel__header">
                 <h1 class="api-control-panel__title">API Control System</h1>
                 <div class="api-control-panel__status-indicator">
-                  <span class="api-control-panel__pulse"></span>
-                  <span class="api-control-panel__status-text">
-                    System Ready
+                  <span id="status-pulse" class="api-control-panel__pulse"></span>
+                  <span id="status-text" class="api-control-panel__status-text">
+                    Loading...
                   </span>
                 </div>
               </div>
@@ -110,14 +79,12 @@
                 >
                   <div class="api-control-panel__input-wrapper">
                     <select
-                      id="item-dropdown"
+                      id="game-list-dropdown"
                       aria-label="Select item to run"
                       class="api-control-panel__select"
+                      style=" background-color:dimgray;"
                     >
-                      <option value="endpoint_v1">Endpoint V1.0</option>
-                      <option value="data_sync">Data Sync Service</option>
-                      <option value="auth_check">Auth Validation</option>
-                      <option value="cache_purge">Cache Purge</option>
+                      <option value="0">Select Game</option>
                     </select>
                     <button
                       id="run-btn"
@@ -141,16 +108,6 @@
                     <span>Stop</span>
                   </button>
                 </div>
-                <button
-                  id="ip-btn"
-                  class="api-control-thq-api-control-panelbtn-elm3 api-control-panel__btn api-control-panel__btn--ip"
-                >
-                  <span
-                    id="icon-ip"
-                    class="api-control-panel__icon-placeholder"
-                  ></span>
-                  <span>IP Address</span>
-                </button>
                 <div
                   class="api-control-panel__group api-control-panel__group--command"
                 >
@@ -179,7 +136,7 @@
                       <input
                         type="text"
                         readonly="true"
-                        value="192.168.1.105"
+                        value="192.168.1.100"
                         class="api-control-panel__ip-text"
                       />
                     </div>
@@ -206,10 +163,17 @@
                     ></span>
                     <span>View Log</span>
                   </button>
-                  <div
-                    class="api-control-thq-api-control-panelgroup-elm4 api-control-panel__group"
-                  ></div>
                 </div>
+                <button
+                  id="ip-btn"
+                  class="api-control-thq-api-control-panelbtn-elm6 api-control-panel__btn api-control-panel__btn--ip"
+                >
+                  <span
+                    id="icon-ip"
+                    class="api-control-panel__icon-placeholder"
+                  ></span>
+                  <span>IP Address</span>
+                </button>
               </div>
             </div>
           </div>
@@ -226,8 +190,8 @@
                 <div class="output-console__title-box">
                   <span>System Output Console</span>
                 </div>
-                <div class="output-console__meta">
-                  <span>UTF-8 | 12.4ms</span>
+                <div id="console-meta" class="output-console__meta">
+                  <span>MESSAGE HEADER</span>
                 </div>
               </div>
               <div id="console-scroller" class="output-console__scroller">
@@ -253,6 +217,8 @@
         </div>
         <div class="api-control-container5">
           <div class="api-control-container6">
+            <script src="setup_run_list.js"></script>
+            <script src="sendMessage.js"></script>
             <script defer="" data-name="api-control-logic">
               (function(){
                 document.addEventListener("DOMContentLoaded", () => {
@@ -282,19 +248,22 @@
 
                   // Button Listeners
                   document.getElementById("run-btn").addEventListener("click", () => {
-                    const item = document.getElementById("item-dropdown").value
-                    logToConsole(`Initializing execution for: ${item}...`, "info")
-                    setTimeout(() => logToConsole(`Process ${item} is now running. PID: ${Math.floor(Math.random() * 9000) + 1000}`, "success"), 800)
+                    const dropdown = document.getElementById("game-list-dropdown")
+                    const item = dropdown.value
+                    if (item == "0") {logToConsole(`Select a game from the dropdown menu.`, "info"); return; }
+                    const name = dropdown.options[dropdown.selectedIndex].text
+                    logToConsole(`Initializing execution for: ${name}...`, "info")
+                    sendMessage('run ' + item);
                   })
 
                   document.getElementById("stop-btn").addEventListener("click", () => {
-                    logToConsole("SIGTERM sent to all active processes.", "error")
-                    logToConsole("Shutdown sequence complete.", "system")
+                    logToConsole("Stoping Mincecraft Server.", "error")
+                    sendMessage('stop');
                   })
 
                   document.getElementById("status-btn").addEventListener("click", () => {
-                    logToConsole("System Status: HEALTHY", "success")
-                    logToConsole("CPU: 12% | RAM: 2.4GB/16GB | Net: 120Mbps", "info")
+                    logToConsole("Retrieving server status...", "info")
+                    sendMessage('status');
                   })
 
                   document.getElementById("command-btn").addEventListener("click", () => {
@@ -302,6 +271,7 @@
                     if (cmd.trim()) {
                       logToConsole(`Executing: ${cmd}`, "cmd")
                       document.getElementById("command-input").value = ""
+                      sendMessage("command " + cmd);
                     }
                   })
 
@@ -312,11 +282,8 @@
                   })
 
                   document.getElementById("view-log-btn").addEventListener("click", () => {
-                    logToConsole("Fetching latest log entries from database...", "info")
-                    setTimeout(() => {
-                      logToConsole("LOG: User admin logged in from 10.0.0.5", "system")
-                      logToConsole("LOG: Database connection re-established", "success")
-                    }, 500)
+                    logToConsole("Fetching latest log entries from the server...", "info")
+                    sendMessage('log');
                   })
 
                   // Handle Enter key on command input
@@ -328,37 +295,9 @@
                 })
               })()
             </script>
+            <script src="constantReceiver.js"></script>
           </div>
         </div>
-        <a href="https://play.teleporthq.io/signup">
-          <div
-            aria-label="Sign up to TeleportHQ"
-            class="api-control-container7"
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 19 21"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              class="api-control-icon1"
-            >
-              <path
-                d="M9.1017 4.64355H2.17867C0.711684 4.64355 -0.477539 5.79975 -0.477539 7.22599V13.9567C-0.477539 15.3829 0.711684 16.5391 2.17867 16.5391H9.1017C10.5687 16.5391 11.7579 15.3829 11.7579 13.9567V7.22599C11.7579 5.79975 10.5687 4.64355 9.1017 4.64355Z"
-                fill="#B23ADE"
-              ></path>
-              <path
-                d="M10.9733 12.7878C14.4208 12.7878 17.2156 10.0706 17.2156 6.71886C17.2156 3.3671 14.4208 0.649963 10.9733 0.649963C7.52573 0.649963 4.73096 3.3671 4.73096 6.71886C4.73096 10.0706 7.52573 12.7878 10.9733 12.7878Z"
-                fill="#FF5C5C"
-              ></path>
-              <path
-                d="M17.7373 13.3654C19.1497 14.1588 19.1497 15.4634 17.7373 16.2493L10.0865 20.5387C8.67402 21.332 7.51855 20.6836 7.51855 19.0968V10.5141C7.51855 8.92916 8.67402 8.2807 10.0865 9.07221L17.7373 13.3654Z"
-                fill="#2874DE"
-              ></path>
-            </svg>
-            <span class="api-control-text23">Built in TeleportHQ</span>
-          </div>
-        </a>
       </div>
       <link
         rel="canonical"

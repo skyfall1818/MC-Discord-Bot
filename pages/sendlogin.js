@@ -1,17 +1,23 @@
+function SendErrorMessage(message) {
+    const errorMessage = document.getElementById('error-message');
+    errorMessage.textContent = message;
+    errorMessage.style.display = 'contents';
+}
+
 async function login() {
     const user = document.getElementById('username').value;
     const pass = document.getElementById('password').value;
     
     if (!user) {
-        statusArea.textContent = "Please enter a username";
+        SendErrorMessage("Please enter a username");
         return
     }
-    if (!user) {
-        statusArea.textContent ="Please enter a password";
+    if (!pass) {
+        SendErrorMessage("Empty password field");
         return
     }
 
-    const serverIp = '192.168.1.101';
+    const serverIp = '192.168.1.100';
     const serverPort = '5000';
     const serverUrl = 'https://' + serverIp + ':' + serverPort + '/login';
 
@@ -32,21 +38,23 @@ async function login() {
             const data = await response.json();
             if (data.reply == "Success") {
                 // Store the variable
-                localStorage.setItem("loggedUser", user);
-                localStorage.setItem("loggedPass", pass);
+                token = data.token;
+                ws_id = data.ws_id;
+                localStorage.setItem("apiToken", token);
+                localStorage.setItem("ws_id", ws_id);
                 
                 // Move to the next page
                 window.location.href = "dashboard.html";
             }
             else {
-                statusArea.textContent = "Incorrect username or password";
+                SendErrorMessage("Incorrect username or password");
             }
         } else {
-            statusArea.textContent = 'Error sending message.';
+            SendErrorMessage('Error sending message.');
         }
     } catch (error) {
         console.error('Error sending message:', error);
-        statusArea.textContent = 'Error connecting to the server.';
+        SendErrorMessage('Error connecting to the server.');
     }
 
 }
