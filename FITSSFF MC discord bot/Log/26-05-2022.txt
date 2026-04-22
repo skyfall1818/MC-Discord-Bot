@@ -1,3 +1,0 @@
-[13:58:51] [Server thread/INFO]: Stopping the server
-[day_time] [philosophi:211309935298871296, command]: /time set day[day_time] [philosophi:211309935298871296, command]: /time set day[day_time] [philosophi:211309935298871296, command]: /time set day
-[day_time] [philosophi:211309935298871296, command]: /time set day

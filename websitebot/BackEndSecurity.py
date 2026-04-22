@@ -1,11 +1,12 @@
 import datetime
 import json
 import jwt
+import subprocess
 
 account_file = "accounts\\account.json"
 
 class Account:
-    def __init__(self, username, password, passcodeFile = account_file):
+    def __init__(self, username, password):
         self.USER = username
         self.PASS = password
     
@@ -17,7 +18,7 @@ class Authenticator:
     def __init__(self, AF = account_file):
         self.Accounts = {}
         self.sessions = {}
-        with open(account_file, 'r', encoding='utf-8') as file:
+        with open(AF, 'r', encoding='utf-8') as file:
             data = json.load(file)
         self.passcode = data["passcode"]
         for acc in data["accounts"]:
@@ -37,7 +38,7 @@ class Authenticator:
             "ip": ip,
             "add": add,
             "iat": datetime.datetime.utcnow(),
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1) # 24-hour expiry
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1) # 1-hour expiry
         }
         secret_key = self.passcode
         token = jwt.encode(payload, secret_key, algorithm="HS256")
@@ -67,4 +68,28 @@ class Authenticator:
             return True
         return False
 
+class FirewallRules:
+    allow_ip = {}
+    def __init__(self, server_port):
+        self.serverPort = server_port
+        subprocess.run('netsh advfirewall firewall delete rule name="Minecraft Whitelist"', shell=True)
+        subprocess.run('netsh advfirewall firewall delete rule name="Website api Whitelist"', shell=True)
+        subprocess.run(f'netsh advfirewall firewall add rule name="Website api Whitelist" dir=in action=allow protocol=TCP localport={server_port}', shell=True)
     
+    def allowIP(self, ip):
+        self.allow_ip[ip] = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        self.purgeRules()
+        self.updateFireWallRules()
+    
+    def purgeRules(self):
+        now = datetime.datetime.utcnow()
+        for ip in self.allow_ip.keys():
+            if now > self.allow_ip[ip]:
+                del self.allow_ip[ip]
+    
+    def updateFireWallRules(self):
+        allow_ip_text = ",".join(self.allow_ip.keys())
+        subprocess.run('netsh advfirewall firewall delete rule name="Minecraft Whitelist"', shell=True)
+        subprocess.run(f'netsh advfirewall firewall add rule name="Minecraft Whitelist" dir=in action=block protocol=TCP localport=25565 remoteip={allow_ip_text}', shell=True)
+
+

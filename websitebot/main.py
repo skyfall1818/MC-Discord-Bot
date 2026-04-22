@@ -6,7 +6,7 @@ import threading
 import time
 import random
 import json
-from BackEndSecurity import Authenticator
+from BackEndSecurity import Authenticator, FirewallRules
 
 from Message_Queuing import Message_Queue
 from MC_bot import message_handler
@@ -36,6 +36,7 @@ def get_local_ip():
 ##################
 hostname = socket.gethostname()
 local_ip = get_local_ip()
+server_port = 5000
 
 # Dictionary to map user IDs to session IDs
 connected_users = {}
@@ -48,6 +49,7 @@ app = Flask(__name__)
 CORS(app)
 app.config['SECRET_KEY'] = 'PD'
 sock = Sock(app)
+Firewall = FirewallRules(server_port)
 Auth = Authenticator()
 
 ################
@@ -99,6 +101,7 @@ def handle_message():
         user = incoming_data.get("user", "")
         ws_id = incoming_data.get("ws_id", "")
         token = incoming_data.get("token", "")
+        print(f"{user}: {ws_id} {token}")
         # Log the received message (optional)
         print(f"Received message: {received_message}")
 
@@ -135,7 +138,7 @@ def handle_message():
     
 @app.route('/request', methods=['POST'])
 def handle_request():
-    global connected_users
+    global connected_users, Firewall
     # 1. Receive the incoming message
     if request.is_json:
         # Parse the JSON data from the request body into a Python dictionary
@@ -157,6 +160,12 @@ def handle_request():
             reply_message = "Server reply: 'Error did not receive message."
         if not token:
             reply_message = "Server reply: 'Error did not receive token."
+
+        elif received_message == "register IP":
+            Firewall.allowIP(ip_addr)
+            reply_message = "Server reply: IP Registered."
+            code = 200
+
         elif Auth.confirm_session(token, user, ip_addr, ws_id):
             code = 200
             my_message_queue = Message_Queue()
@@ -259,9 +268,8 @@ def handle_socket(ws, user_id):
                 print(f"Message queue deleted: {user_id}")
 
 if __name__ == '__main__':
-    # Run the server on http://localhost:5000
     print(f"Running on: {hostname}")
     print(f"Local IP: {local_ip}")
     kill_connections_thread = threading.Thread(target=kill_connection_thread)
     kill_connections_thread.start()
-    app.run(debug=True, host=local_ip, port=5000, ssl_context=('SSL/cert.pem', 'SSL/key.pem'))
+    app.run(debug=True, host=local_ip, port=server_port, ssl_context=('SSL/cert.pem', 'SSL/key.pem'))
