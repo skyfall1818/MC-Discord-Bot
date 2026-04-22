@@ -91,7 +91,10 @@ def handle_message():
     # 1. Receive the incoming message
     if request.is_json:
         # Parse the JSON data from the request body into a Python dictionary
+        ip_addr = request.remote_addr
+        print(f'receive message from {ip_addr}')
         incoming_data = request.get_json()
+
         received_message = incoming_data.get("message", "")
         user = incoming_data.get("user", "")
         ws_id = incoming_data.get("ws_id", "")
@@ -106,7 +109,7 @@ def handle_message():
             reply_message = "Server reply: 'Error did not receive message."
         if not token:
             reply_message = "Server reply: 'Error did not receive token."
-        elif Auth.confirm_session(user, token, add = ws_id):
+        elif Auth.confirm_session(token, user, ip_addr, add = ws_id):
             reply_message = f"Server reply: received '{received_message}'. Status: Success."
             code = 200
             message_args = received_message.split()
@@ -136,6 +139,8 @@ def handle_request():
     # 1. Receive the incoming message
     if request.is_json:
         # Parse the JSON data from the request body into a Python dictionary
+        ip_addr = request.remote_addr
+        print(f'receive request from {ip_addr}')
         incoming_data = request.get_json()
         received_message = incoming_data.get("message", "No message provided")
         user = incoming_data.get("user", "")
@@ -152,7 +157,7 @@ def handle_request():
             reply_message = "Server reply: 'Error did not receive message."
         if not token:
             reply_message = "Server reply: 'Error did not receive token."
-        elif Auth.confirm_session(user, token, ws_id):
+        elif Auth.confirm_session(token, user, ip_addr, ws_id):
             code = 200
             my_message_queue = Message_Queue()
             message_handler(my_message_queue, *received_message.split())
@@ -180,6 +185,7 @@ def handle_login():
     # 1. Receive the incoming message
     if request.is_json:
         # Parse the JSON data from the request body into a Python dictionary
+        ip_addr = request.remote_addr
         incoming_data = request.get_json()
         username = incoming_data.get("user", "No message provided")
         password = incoming_data.get("pass", "No message provided")
@@ -195,8 +201,9 @@ def handle_login():
         if Auth.authenticate_user(username, password):
             reply_message = "Success"
             ws_id = str(get_ws_id())
-            token = Auth.generate_token_session(username, password, ws_id)
+            token = Auth.generate_token_session(username, password, ip_addr, ws_id)
             connected_users[ws_id] = Message_Queue()
+            print(f'login session authorized for: [{ip_addr}]:{username}')
             print(f'websocket ID: {ws_id}')
         print(reply_message)
         # 3. Send the reply

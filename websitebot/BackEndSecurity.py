@@ -31,9 +31,10 @@ class Authenticator:
             return True
         return False
     
-    def generate_token(self, usr, add = ''):
+    def generate_token(self, usr, ip, add = ''):
         payload = {
             "name": usr,
+            "ip": ip,
             "add": add,
             "iat": datetime.datetime.utcnow(),
             "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1) # 24-hour expiry
@@ -53,16 +54,16 @@ class Authenticator:
             print("Invalid token")
         return None
 
-    def generate_token_session(self, username, password, add=''):
+    def generate_token_session(self, username, password, ip, add=''):
         if self.authenticate_user(username, password):
-            token = self.generate_token(username, add)
+            token = self.generate_token(username, ip, add)
             self.sessions[username] =add
             return token
         return ''
     
-    def confirm_session(self, user, token, add=''):
+    def confirm_session(self, token, user, ip, add=''):
         session = self.decode_token(token)
-        if session and session["name"] == user and session["add"] == add:
+        if session and session["name"] == user and session["add"] == add and session["ip"] == ip:
             return True
         return False
 
