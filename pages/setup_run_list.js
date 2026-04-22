@@ -33,6 +33,11 @@ async function sendRequest(message){
     const token = localStorage.getItem("apiToken");
     const ws_id = localStorage.getItem("ws_id");
 
+    if (!message) {
+        console.log('Message cannot be empty.');
+        return;
+    }
+    
     try {
         const response = await fetch(serverUrl, {
             method: 'POST', // Use POST method to send data in the body

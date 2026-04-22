@@ -15,12 +15,16 @@
   flex-direction: column;
 }
  
+.api-control-container3 {
+  flex: 0 0 auto;
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
 .api-control-thq-api-control-panelbtn-elm6 {
   width: 116px;
-}
- 
-.api-control-container3 {
-  display: none;
 }
  
 .api-control-container4 {

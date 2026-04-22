@@ -646,7 +646,6 @@
   background: var(--api-stop);
   border-radius: 50%;
 }
-
  
 .api-control-panel__input-wrapper {
   width: 100%;
@@ -711,8 +710,6 @@
   border-radius: 0;
 }
  
-
- 
 .api-control-panel__input {
   color: var(--api-text);
   border: none;
@@ -733,6 +730,12 @@
   color: white;
   width: 100%;
   background: #0ea5e9;
+}
+
+.api-control-panel__btn--register {
+  color: white;
+  width: 100%;
+  background: #b253c1;
 }
  
 .api-control-panel__reveal-box {

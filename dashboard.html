@@ -107,6 +107,16 @@
                     ></span>
                     <span>Stop</span>
                   </button>
+                  <button
+                    id="status-btn"
+                    class="api-control-thq-api-control-panelbtn-elm6 api-control-panel__btn api-control-panel__btn--status"
+                  >
+                    <span
+                      id="icon-status"
+                      class="api-control-panel__icon-placeholder"
+                    ></span>
+                    <span>Status</span>
+                  </button>
                 </div>
                 <div
                   class="api-control-panel__group api-control-panel__group--command"
@@ -130,28 +140,7 @@
                     </button>
                   </div>
                 </div>
-                <div class="api-control-panel__group">
-                  <div class="api-control-panel__reveal-wrapper">
-                    <div id="ip-display" class="api-control-panel__reveal-box">
-                      <input
-                        type="text"
-                        readonly="true"
-                        value="192.168.1.100"
-                        class="api-control-panel__ip-text"
-                      />
-                    </div>
-                  </div>
-                </div>
-                <button
-                  id="status-btn"
-                  class="api-control-panel__btn api-control-panel__btn--status"
-                >
-                  <span
-                    id="icon-status"
-                    class="api-control-panel__icon-placeholder"
-                  ></span>
-                  <span>Status</span>
-                </button>
+                <br>
                 <div class="api-control-container2">
                   <button
                     id="view-log-btn"
@@ -166,13 +155,35 @@
                 </div>
                 <button
                   id="ip-btn"
-                  class="api-control-thq-api-control-panelbtn-elm6 api-control-panel__btn api-control-panel__btn--ip"
+                  class="api-control-panel__btn api-control-panel__btn--ip"
                 >
                   <span
                     id="icon-ip"
                     class="api-control-panel__icon-placeholder"
                   ></span>
-                  <span>IP Address</span>
+                  <span>View IP Address</span>
+                </button>
+                <div class="api-control-panel__group">
+                  <div class="api-control-panel__reveal-wrapper">
+                    <div id="ip-display" class="api-control-panel__reveal-box">
+                      <input
+                        type="text"
+                        readonly="true"
+                        value="192.168.1.100"
+                        class="api-control-panel__ip-text"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <button
+                  id="reg-ip-btn"
+                  class="api-control-thq-api-control-panelbtn-elm6 api-control-panel__btn api-control-panel__btn--register"
+                >
+                  <span
+                    id="icon-ip"
+                    class="api-control-panel__icon-placeholder"
+                  ></span>
+                  <span>Register IP</span>
                 </button>
               </div>
             </div>
@@ -291,6 +302,16 @@
                     if (e.key === "Enter") {
                       document.getElementById("command-btn").click()
                     }
+                  })
+
+                  document.getElementById("reg-ip-btn").addEventListener("click", () => {
+                    logToConsole("Requesting register the IP...", "info")
+                    const out_req = sendRequest('register IP');
+                    out_req.then((out_req) => {
+                      if (out_req != ""){
+                        logToConsole(out_req, "success")
+                      }
+                    })
                   })
                 })
               })()
