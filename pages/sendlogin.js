@@ -40,6 +40,7 @@ async function login() {
                 // Store the variable
                 token = data.token;
                 ws_id = data.ws_id;
+                localStorage.setItem("apiUser", user);
                 localStorage.setItem("apiToken", token);
                 localStorage.setItem("ws_id", ws_id);
                 

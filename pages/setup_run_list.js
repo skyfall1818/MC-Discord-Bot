@@ -29,15 +29,20 @@ async function sendRequest(message){
     const serverIp = '192.168.1.100';
     const serverPort = '5000';
     const serverUrl = 'https://' + serverIp + ':' + serverPort + '/request';
+    const user = localStorage.getItem("apiUser");
     const token = localStorage.getItem("apiToken");
+    const ws_id = localStorage.getItem("ws_id");
+
     try {
         const response = await fetch(serverUrl, {
             method: 'POST', // Use POST method to send data in the body
             headers: {
                 'Content-Type': 'application/json' // Indicate JSON data
             },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
+                user: user,
                 token: token,
+                ws_id: ws_id,
                 message: message
             }) // Send the data as a JSON string
         })
