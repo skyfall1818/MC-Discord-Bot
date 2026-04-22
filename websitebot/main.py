@@ -39,7 +39,6 @@ local_ip = get_local_ip()
 
 # Dictionary to map user IDs to session IDs
 connected_users = {}
-connected_users['1234'] = Message_Queue()
 
 timeout_connection = 600
 allowed_connections = 30
@@ -94,6 +93,7 @@ def handle_message():
         # Parse the JSON data from the request body into a Python dictionary
         incoming_data = request.get_json()
         received_message = incoming_data.get("message", "")
+        user = incoming_data.get("user", "")
         ws_id = incoming_data.get("ws_id", "")
         token = incoming_data.get("token", "")
         # Log the received message (optional)
@@ -106,7 +106,7 @@ def handle_message():
             reply_message = "Server reply: 'Error did not receive message."
         if not token:
             reply_message = "Server reply: 'Error did not receive token."
-        elif Auth.confirm_session(token, add = ws_id):
+        elif Auth.confirm_session(user, token, add = ws_id):
             reply_message = f"Server reply: received '{received_message}'. Status: Success."
             code = 200
             message_args = received_message.split()
@@ -138,6 +138,8 @@ def handle_request():
         # Parse the JSON data from the request body into a Python dictionary
         incoming_data = request.get_json()
         received_message = incoming_data.get("message", "No message provided")
+        user = incoming_data.get("user", "")
+        ws_id = incoming_data.get("ws_id", "")
         token = incoming_data.get("token", "")
 
         # Log the received message (optional)
@@ -150,7 +152,7 @@ def handle_request():
             reply_message = "Server reply: 'Error did not receive message."
         if not token:
             reply_message = "Server reply: 'Error did not receive token."
-        elif Auth.confirm_session(token):
+        elif Auth.confirm_session(user, token, ws_id):
             code = 200
             my_message_queue = Message_Queue()
             message_handler(my_message_queue, *received_message.split())
@@ -247,7 +249,6 @@ def handle_socket(ws, user_id):
                 time.sleep(3)
             if user_id in connected_users:
                 del connected_users[user_id]
-                Auth.delete_session_by_name(user_id,'add')
                 print(f"Message queue deleted: {user_id}")
 
 if __name__ == '__main__':
