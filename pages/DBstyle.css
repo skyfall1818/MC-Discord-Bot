@@ -553,7 +553,7 @@
   color: var(--api-text);
   display: flex;
   padding: 60px 20px;
-  background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
+  background: #0f172a;
   min-height: 50vh;
   align-items: center;
   font-family: var(--font-main);
