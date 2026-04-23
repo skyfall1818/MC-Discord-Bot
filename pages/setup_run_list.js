@@ -26,7 +26,7 @@ function set_connection_status(status){
 }
 
 async function sendRequest(message){
-    const serverIp = '192.168.1.100';
+    const serverIp = document.getElementById('ip-text').value;
     const serverPort = '5000';
     const serverUrl = 'https://' + serverIp + ':' + serverPort + '/request';
     const user = localStorage.getItem("apiUser");
@@ -37,7 +37,7 @@ async function sendRequest(message){
         console.log('Message cannot be empty.');
         return;
     }
-    
+
     try {
         const response = await fetch(serverUrl, {
             method: 'POST', // Use POST method to send data in the body

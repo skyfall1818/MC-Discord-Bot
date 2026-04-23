@@ -75,6 +75,7 @@ class FirewallRules:
         subprocess.run('netsh advfirewall firewall delete rule name="Minecraft Whitelist"', shell=True)
         subprocess.run('netsh advfirewall firewall delete rule name="Website api Whitelist"', shell=True)
         subprocess.run(f'netsh advfirewall firewall add rule name="Website api Whitelist" dir=in action=allow protocol=TCP localport={server_port}', shell=True)
+        subprocess.run('netsh advfirewall firewall add rule name="Minecraft Whitelist" dir=in action=block protocol=TCP localport=25565', shell=True)
     
     def allowIP(self, ip):
         self.allow_ip[ip] = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
@@ -90,6 +91,5 @@ class FirewallRules:
     def updateFireWallRules(self):
         allow_ip_text = ",".join(self.allow_ip.keys())
         subprocess.run('netsh advfirewall firewall delete rule name="Minecraft Whitelist"', shell=True)
-        subprocess.run(f'netsh advfirewall firewall add rule name="Minecraft Whitelist" dir=in action=block protocol=TCP localport=25565 remoteip={allow_ip_text}', shell=True)
-
-
+        subprocess.run(f'netsh advfirewall firewall add rule name="Minecraft Whitelist" dir=in action=allow protocol=TCP localport=25565 remoteip={allow_ip_text}', shell=True)
+        

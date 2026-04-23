@@ -17,7 +17,7 @@ async function login() {
         return
     }
 
-    const serverIp = '192.168.1.100';
+    const serverIp = '97.102.77.55';
     const serverPort = '5000';
     const serverUrl = 'https://' + serverIp + ':' + serverPort + '/login';
 

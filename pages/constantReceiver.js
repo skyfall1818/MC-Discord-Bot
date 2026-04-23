@@ -1,6 +1,7 @@
 // Connect to the WebSocket server
+const serverIp = document.getElementById('ip-text').value;
 const ws_id = localStorage.getItem("ws_id")
-const ws = new WebSocket('wss://192.168.1.100:5000/ws/' + ws_id + '?');
+const ws = new WebSocket('wss://'+ serverIp + ':5000/ws/' + ws_id + '?');
 const headerLog = document.getElementById('console-meta');
 ws.onopen = () => {
     console.log('Connected to server');

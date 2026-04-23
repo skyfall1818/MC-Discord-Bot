@@ -1,6 +1,6 @@
 
 async function sendMessage(message) {
-    const serverIp = '192.168.1.100';
+    const serverIp = document.getElementById('ip-text').value;
     const serverPort = '5000';
     const serverUrl = 'https://' + serverIp + ':' + serverPort + '/message';
     const user = localStorage.getItem("apiUser");
